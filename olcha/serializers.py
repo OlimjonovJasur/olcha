@@ -41,9 +41,6 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
 class ProductDetailSerializer(ProductSerializer):
-    """
-    Mahsulot haqida to'liq ma'lumot uchun serializer
-    """
     category_name = serializers.SerializerMethodField()
     category_id = serializers.SerializerMethodField()
     subcategory_id = serializers.SerializerMethodField()
@@ -67,8 +64,7 @@ class ProductDetailSerializer(ProductSerializer):
         return None
 
     def get_comments(self, obj):
-        # Faqat so'nggi 5 ta commentni qaytarish
-        comments = obj.comment_product.all().order_by('-created')[:5]
+        comments = obj.comment_product.all().order_by('-created')[:5]   # Faqat so'nggi 5 ta commentni qaytarish
         return CommentModelSerializer(comments, many=True, context=self.context).data
 
     def get_average_rating(self, obj):
@@ -112,9 +108,6 @@ class CategorySerializer(serializers.ModelSerializer):
 
 
 class CategoryDetailSerializer(CategorySerializer):
-    """
-    Kategoriya haqida to'liq ma'lumot uchun serializer
-    """
     subcategories = SubCategorySerializer(many=True, read_only=True)
 
     class Meta:

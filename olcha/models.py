@@ -3,6 +3,7 @@ from django.utils.text import slugify
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from phonenumber_field.modelfields import PhoneNumberField
+from decimal import Decimal
 
 
 class Category(models.Model):
@@ -43,17 +44,20 @@ class Product(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     likes = models.ManyToManyField(User, related_name='products', blank=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='products')
     subcategory = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True, blank=True,
                                     related_name='products')
 
     def save(self, *args, **kwargs):
+        # Agar subcategory tanlangan bo'lsa, category ni avtomatik ravishda o'rnatish
+        if self.subcategory and not self.category:
+            self.category = self.subcategory.category
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
-
 
 
 class ProductImage(models.Model):
@@ -97,7 +101,9 @@ class Order(models.Model):
         if not self.pk and self.product.quantity >= self.quantity:
             # Chegirmali narxni hisoblaymiz
             if self.product.discount > 0:
-                price = self.product.price * (1 - self.product.discount / 100)
+                # self.product.discount ni Decimal turiga o'tkazish
+                discount = Decimal(self.product.discount)
+                price = self.product.price * (1 - discount / 100)
             else:
                 price = self.product.price
 

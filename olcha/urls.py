@@ -3,19 +3,16 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 from olcha import views
 
-
 router = DefaultRouter()
 router.register(r'categories', views.CategoryViewSet)
 router.register(r'subcategories', views.SubCategoryViewSet)
 router.register(r'products', views.ProductViewSet)
-router.register(r'product-images', views.ProductImageViewSet)
+router.register(r'product-images', views.ProductImageViewSet)  # Bu yerda ro'yxatga olish kerak
 router.register(r'orders', views.OrderViewSet, basename='order')
 
 urlpatterns = [
-    # Avtomatik URL'lar:
     path('', include(router.urls)),
 
-    # Commentlar uchun URL'lar:
     path('comments/', views.CommentListCreateView.as_view(), name='comment-list-create'),
     path('comments/by-product/<int:pk>/', views.CommentListCreateView.as_view(), name='comment-list-create-by-product'),
 
